@@ -12,12 +12,16 @@ const onHoldUl = document.querySelector('.on-hold-list');
 
 let tempEl;
 
+//this will become id of list we drag from
+
+let fromListID;
+
 //4 arrays for 4 ul lists to hold items
 
-const backlog = [];
-const progress = [];
-const complete = [];
-const onHold = [];
+let backlog = [];
+let progress = [];
+let complete = [];
+let onHold = [];
 
 
 /** 
@@ -38,6 +42,47 @@ function setup(){
     progressUl.addEventListener('drop', drop);
     completeUl.addEventListener('drop', drop);
     onHoldUl.addEventListener('drop', drop);
+
+    renderOnce();
+}
+
+
+/** 
+* * render
+* ? For each array item renders li elemnet
+* ? Renders for all for arrays at page load
+*/
+
+function renderOnce(){
+
+    if(Array.isArray(backlog) && backlog.length > 0){
+        backlog.forEach(item => backLogUl.appendChild(createLiElement(item)))
+    }
+    if(Array.isArray(progress) && progress.length > 0){
+        progress.forEach(item => progressUl.appendChild(createLiElement(item)))
+    }
+    if(Array.isArray(complete) && complete.length > 0){
+        complete.forEach(item => completeUl.appendChild(createLiElement(item)))
+    }
+    if(Array.isArray(onHold) && onHold.length > 0){
+        onHold.forEach(item => onHoldUl.appendChild(createLiElement(item)))
+    }
+
+}
+
+/** 
+* * reRenderList
+* @param id Id of ul list that needs to rerender
+* ? This method is called every time on each array that has changes to be updated
+* ! This is most called function, any performance improvement is good to implement
+*/
+
+function reRenderList(id){
+    let list = document.getElementById(id);
+    while(list.firstElementChild){
+        list.firstElementChild.remove();
+    }
+    this.forEach(item => list.appendChild(createLiElement(item)));
 }
 
 
@@ -55,7 +100,6 @@ function createLiElement(textContent){
     el.draggable = true;
     el.textContent = textContent;
     el.addEventListener('dragstart', drag);
-    backLogUl.appendChild(el);
     return el;
 }
 
@@ -69,6 +113,7 @@ function createLiElement(textContent){
 
 function drag(e){
     tempEl = e.target;
+    fromListID = e.target.parentElement.id;
 }
 
 
@@ -77,11 +122,15 @@ function drag(e){
 * @param e Event that triggers when we enter the ul list
 * ? We just need to prevent default behavior of ul list
 * ? List will now show that dragged item can be droped inside ul list
+* * Adding class for list that will receive item, also removing same class from other lists if any
 */
-
 
 function allowDrop(e){
     e.preventDefault();
+    for(let i = 0; i < ulElems.length; i++){
+        ulElems[i].classList.remove('on-hover-column');
+    }
+    e.target.classList.add('on-hover-column');
 }
 
 
@@ -98,6 +147,7 @@ function allowDrop(e){
 
 function drop(e){
     e.preventDefault();
+    e.target.classList.remove('on-hover-column');
     let id = e.target.id;
     if(!e.target.id){
         id = e.target.parentElement.id;
@@ -116,22 +166,84 @@ function drop(e){
 function pushToArray(id){
     const item = tempEl;
     if(id == backLogUl.getAttribute('id')){
-        backlog.push(item.textContent);
-        console.log(backlog)
-        return;
+          backlog.push(item.textContent);
+          reRenderList.call(backlog, id);
+          saveToLocalStorage.call(backlog, id);
     }
     if(id == progressUl.getAttribute('id')){
-        progress.push(item.textContent);
-        console.log(progress)
-        return;
+          progress.push(item.textContent);
+          reRenderList.call(progress, id);
+          saveToLocalStorage.call(progress, id);
     }
     if(id == completeUl.getAttribute('id')){
-       return complete.push(item.textContent);
+          complete.push(item.textContent);
+          reRenderList.call(complete, id);
+          saveToLocalStorage.call(complete, id);
     }
     if(id == onHoldUl.getAttribute('id')){
-       return onHold.push(item.textContent);ss
+          onHold.push(item.textContent);
+          reRenderList.call(onHold, id);
+          saveToLocalStorage.call(onHold, id);
+    }
+    removeFromArray(fromListID, item.textContent);
+}
+
+/** 
+* * removeFromArray
+* @param arrID ID of ul list that represents the array, 4 possibility can happen (backlog, progress, complete, onHold)
+* **           each representing one of the array from above
+* @param textMatch Remove item with this text
+* ? Once item is dragged from ul list, we need to update the array
+* * 
+*/
+
+function removeFromArray(arrID, textMatch){
+    if(arrID === 'backlog'){
+        let index = backlog.indexOf(textMatch);
+        backlog.splice(index, 1);
+        reRenderList.call(backlog, arrID);
+        saveToLocalStorage.call(backlog, arrID);
+    }
+    if(arrID === 'progress'){
+        let index = progress.indexOf(textMatch);
+        progress.splice(index, 1);
+        reRenderList.call(progress, arrID);
+        saveToLocalStorage.call(progress, arrID);
+    }
+    if(arrID === 'complete'){
+        let index = complete.indexOf(textMatch);
+        complete.splice(index, 1);
+        reRenderList.call(complete, arrID);
+        saveToLocalStorage.call(complete, arrID);
+    }
+    if(arrID === 'on-hold'){
+        let index = onHold.indexOf(textMatch);
+        onHold.splice(index, 1);
+        reRenderList.call(onHold, arrID);
+        saveToLocalStorage.call(onHold, arrID);
     }
 }
 
-//
+/** 
+* * saveToLocalStorage
+*  Saving the 4 arrays in local storage
+* TODO: We only need to update 2 array here, one we remove from, and one we add to
+*/
+
+function saveToLocalStorage(item){
+    localStorage.setItem(`${item}`, JSON.stringify(this));
+}
+
+/** 
+* * getAllFromLocalStorage
+* ? Loads only once, just to fetch latest data, if there is any
+*/
+function getAllFromLocalStorage(){
+  backlog  = JSON.parse(localStorage.getItem('backlog')) || [];
+  progress  = JSON.parse(localStorage.getItem('progress')) || [];
+  complete  = JSON.parse(localStorage.getItem('complete')) || [];
+  onHold  = JSON.parse(localStorage.getItem('on-hold')) || [];
+}
+
+getAllFromLocalStorage();
 setup();

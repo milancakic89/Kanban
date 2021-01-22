@@ -27,7 +27,8 @@ html{
     --column-4: #a22d22;
 }
 body{
-    background-image: url('bcg.jpg');
+    
+    background-color: rgb(209, 161, 5);
     padding: 0;
     margin: 0;
     background-size: cover;
@@ -83,22 +84,39 @@ body{
     list-style-type: none;
     text-align: left;
     padding: 0;
-    background-color: #1b6161;
+    background-color: #21222234;
     height: calc(100% - 85px);
     max-height: 62vh;
     overflow-y: auto;
 }
+.on-hover-column{
+    background-color: #1b6161;
+    outline: 2px solid rgb(16, 153, 57);
+}
 .backlog h2{
     background-color: var(--column-1);
+}
+.backlog li{
+    background-color: #a2622dad;
 }
 .progress h2{
     background-color: var(--column-2);
 }
+.progress li{
+
+    background-color:  #1b6161;
+}
 .complete h2{
     background-color: var(--column-3);
 }
+.complete li{
+    background-color: #2482249a;
+}
 .on-hold h2{
     background-color: var(--column-4);
+}
+.on-hold li{
+    background-color: #a22d22a9;
 }
 .column{
     border-radius: 4px;
