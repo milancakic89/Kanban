@@ -7,6 +7,8 @@ const progressUl = document.querySelector('.progress-list');
 const completeUl = document.querySelector('.complete-list');
 const onHoldUl = document.querySelector('.on-hold-list');
 const trash = document.querySelector('#trash');
+const add = document.querySelector('#add-backlog');
+const newItem = document.querySelector('#new-item');
 
 
 // This variable will become draged element once we start draging
@@ -34,6 +36,7 @@ let onHold = [];
 
 
 function setup(){
+    add.addEventListener('click', addNewItem)
     backLogUl.addEventListener('dragover', allowDrop);
     progressUl.addEventListener('dragover', allowDrop);
     completeUl.addEventListener('dragover', allowDrop);
@@ -49,6 +52,14 @@ function setup(){
     renderOnce();
 }
 
+function addNewItem(e){
+    if(newItem.value !== ''){
+        backlog.push(newItem.value);
+        reRenderList.call(backlog, 'backlog');
+        newItem.value = '';
+        saveToLocalStorage(backlog);
+    }
+}
 
 /** 
 * * render

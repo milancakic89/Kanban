@@ -85,7 +85,7 @@ body{
     padding: 0;
     background-color: #21222234;
     height: calc(100% - 85px);
-    max-height: 62vh;
+    max-height: 42vh;
     overflow-y: auto;
 }
 .on-hover-column{
@@ -123,6 +123,7 @@ body{
     margin: 10px;
     background-color: rgba(0, 0, 0, 0.445);
     padding: 0;
+    position: relative;
 }
 @media (min-width: 600px){
    .container{
@@ -143,4 +144,44 @@ body{
 .edit{
     background-color: blueviolet !important;
     cursor: text !important;
+}
+.sub--title{
+    text-align: center;
+    color: #fff;
+}
+.add--item{
+    padding: 7px;
+    margin: 3px;
+    display: inline-block;
+    color: rgb(255, 255, 255);
+}
+
+.backlog .add--item{
+    background-color: rgba(0, 0, 0, 0.445)
+}
+.add--item:hover{
+    background-color: rgba(90, 8, 197, 0.445);
+    cursor: pointer;
+}
+.add{
+    padding: 7px;
+    width: calc(100% - 18px);
+    max-width: 200px;
+    margin: 3px;
+
+}
+.hide{
+   visibility: hidden;
+}
+.add{
+    display: none;
+}
+.hide:checked ~ .add{
+    display: block;
+}
+.add-holder{
+    padding: 3px;
+    margin-top: -9px;
+    min-height: 80px;
+    background-color: rgba(0, 0, 0, 0.445);
 }

@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Kanban Board</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1 class="main--title">Kanban</h1>
+    <h2 class="sub--title">Double click to edit item</h2>
     <div class="container">
         <div class="column backlog">
             <h2>Backlog</h2>
             <ul class="list backlog-list" id="backlog">
-
+               
             </ul>
+            <div class="add-holder">
+            <label for="add-item" class="add--item" id="add-backlog">Add Item</label>
+            <input type="checkbox" id="add-item" class="hide">
+            <input class="add" id="new-item">
+        </div>
         </div>
         <div class="column progress">
             <h2>Progress</h2>
