@@ -112,8 +112,21 @@ function createLiElement(textContent){
     el.classList.add('item');
     el.draggable = true;
     el.textContent = textContent;
+    el.contentEditable = "false";
     el.addEventListener('dragstart', drag);
+    el.addEventListener('dblclick', editContent);
     return el;
+}
+
+function editContent(e){
+    console.log('happens')
+    if(e.target.contentEditable === "false"){
+        e.target.contentEditable = "true";
+        e.target.classList.add('edit');
+    }else{
+        e.target.contentEditable = "false";
+        e.target.classList.remove('edit');
+    }
 }
 
 /** 

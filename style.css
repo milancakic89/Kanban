@@ -68,7 +68,7 @@ body{
     color: #fff;
     margin: 10px auto;
     width: 90%;
-    cursor: pointer;
+    cursor: grab;
     -webkit-user-select: none;         
     -moz-user-select: none; 
     -ms-user-select: none; 
@@ -139,4 +139,8 @@ body{
 #trash:hover{
     color: rgb(253, 24, 24);
     cursor: pointer;
+}
+.edit{
+    background-color: blueviolet !important;
+    cursor: text !important;
 }
