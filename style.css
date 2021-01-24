@@ -27,8 +27,7 @@ html{
     --column-4: #a22d22;
 }
 body{
-    
-    background-color: rgb(209, 161, 5);
+    background-image: url('bcg.jpg');
     padding: 0;
     margin: 0;
     background-size: cover;
@@ -129,4 +128,15 @@ body{
    .container{
        flex-direction: row;
    }
+}
+#trash{
+    font-size: 3em;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+   color: #fff;
+}
+#trash:hover{
+    color: rgb(253, 24, 24);
+    cursor: pointer;
 }

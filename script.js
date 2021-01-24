@@ -6,6 +6,7 @@ const backLogUl = document.querySelector('.backlog-list');
 const progressUl = document.querySelector('.progress-list');
 const completeUl = document.querySelector('.complete-list');
 const onHoldUl = document.querySelector('.on-hold-list');
+const trash = document.querySelector('#trash');
 
 
 // This variable will become draged element once we start draging
@@ -37,11 +38,13 @@ function setup(){
     progressUl.addEventListener('dragover', allowDrop);
     completeUl.addEventListener('dragover', allowDrop);
     onHoldUl.addEventListener('dragover', allowDrop);
+    trash.addEventListener('dragover', trashItem)
 
     backLogUl.addEventListener('drop', drop);
     progressUl.addEventListener('drop', drop);
     completeUl.addEventListener('drop', drop);
     onHoldUl.addEventListener('drop', drop);
+    trash.addEventListener('drop', trashDrop);
 
     renderOnce();
 }
@@ -54,18 +57,26 @@ function setup(){
 */
 
 function renderOnce(){
+    let backlogFragment = document.createDocumentFragment();
+    let progressFragment = document.createDocumentFragment();
+    let completeFragment = document.createDocumentFragment();
+    let onHoldFragment = document.createDocumentFragment();
 
     if(Array.isArray(backlog) && backlog.length > 0){
-        backlog.forEach(item => backLogUl.appendChild(createLiElement(item)))
+        backlog.forEach(item => backlogFragment.appendChild(createLiElement(item)));
+        backLogUl.appendChild(backlogFragment);
     }
     if(Array.isArray(progress) && progress.length > 0){
-        progress.forEach(item => progressUl.appendChild(createLiElement(item)))
+        progress.forEach(item => progressFragment.appendChild(createLiElement(item)));
+        progressUl.appendChild(progressFragment);
     }
     if(Array.isArray(complete) && complete.length > 0){
-        complete.forEach(item => completeUl.appendChild(createLiElement(item)))
+        complete.forEach(item => completeFragment.appendChild(createLiElement(item)));
+        completeUl.appendChild(completeFragment);
     }
     if(Array.isArray(onHold) && onHold.length > 0){
-        onHold.forEach(item => onHoldUl.appendChild(createLiElement(item)))
+        onHold.forEach(item => onHoldFragment.appendChild(createLiElement(item)));
+        onHoldUl.appendChild(onHoldFragment);
     }
 
 }
@@ -78,11 +89,13 @@ function renderOnce(){
 */
 
 function reRenderList(id){
+    let fragment = document.createDocumentFragment();
     let list = document.getElementById(id);
     while(list.firstElementChild){
         list.firstElementChild.remove();
     }
-    this.forEach(item => list.appendChild(createLiElement(item)));
+    this.forEach(item => fragment.appendChild(createLiElement(item)));
+    list.appendChild(fragment);
 }
 
 
@@ -133,6 +146,17 @@ function allowDrop(e){
     e.target.classList.add('on-hover-column');
 }
 
+function trashItem(e){
+    e.preventDefault();
+    e.target.style.color = 'red';
+}
+
+function trashDrop(e){
+    e.preventDefault();
+    removeFromArray(fromListID, tempEl.textContent);
+    e.target.style.color = 'white';
+}
+
 
 /** 
 * * drop
@@ -147,10 +171,13 @@ function allowDrop(e){
 
 function drop(e){
     e.preventDefault();
-    e.target.classList.remove('on-hover-column');
-    let id = e.target.id;
-    if(!e.target.id){
-        id = e.target.parentElement.id;
+    const { target } = e;
+    let { id } = e.target;
+
+    target.classList.remove('on-hover-column');
+
+    if(!id){
+        id = target.parentElement.id;
     }
     // This event holds item of ul list that accepts draged item, so we can extract id
     pushToArray(id)
@@ -226,8 +253,7 @@ function removeFromArray(arrID, textMatch){
 
 /** 
 * * saveToLocalStorage
-*  Saving the 4 arrays in local storage
-* TODO: We only need to update 2 array here, one we remove from, and one we add to
+*  Saving the array in local storage
 */
 
 function saveToLocalStorage(item){
