@@ -41,6 +41,7 @@ body{
     letter-spacing: 16px;
     text-transform: uppercase;
     font-size: 40px;
+    margin: 8px 0;
 
 }
 .container{
@@ -148,6 +149,7 @@ body{
 .sub--title{
     text-align: center;
     color: #fff;
+    margin: 8px 0;
 }
 .add--item{
     padding: 7px;
@@ -181,7 +183,10 @@ body{
 }
 .add-holder{
     padding: 3px;
-    margin-top: -9px;
+    margin-top: -1px;
     min-height: 80px;
+    position: absolute;
     background-color: rgba(0, 0, 0, 0.445);
+    bottom: -90px;
+    width: calc(100% - 6px);
 }
