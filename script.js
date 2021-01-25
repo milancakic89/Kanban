@@ -1,6 +1,4 @@
-
-//Here are the elements that will be used for drag and drop
-
+//list of elements that will be used for drag and drop
 const ulElems = document.querySelectorAll('.list');
 const backLogUl = document.querySelector('.backlog-list');
 const progressUl = document.querySelector('.progress-list');
@@ -11,21 +9,10 @@ const add = document.querySelector('#add-backlog');
 const newItem = document.querySelector('#new-item');
 
 
-// This variable will become draged element once we start draging
-
-let tempEl;
-
-//this will become id of list we drag from
-
-let fromListID;
-
-//4 arrays for 4 ul lists to hold items
-
 let backlog = [];
 let progress = [];
 let complete = [];
 let onHold = [];
-
 
 /** 
 * * setup
@@ -35,13 +22,13 @@ let onHold = [];
 */
 
 
-function setup(){
+ function setup(){
     add.addEventListener('click', addNewItem)
     backLogUl.addEventListener('dragover', allowDrop);
     progressUl.addEventListener('dragover', allowDrop);
     completeUl.addEventListener('dragover', allowDrop);
     onHoldUl.addEventListener('dragover', allowDrop);
-    trash.addEventListener('dragover', trashItem)
+    trash.addEventListener('dragover', trashItem);
 
     backLogUl.addEventListener('drop', drop);
     progressUl.addEventListener('drop', drop);
@@ -52,22 +39,109 @@ function setup(){
     renderOnce();
 }
 
-function addNewItem(e){
-    if(newItem.value !== ''){
-        backlog.push(newItem.value);
-        reRenderList.call(backlog, 'backlog');
-        newItem.value = '';
-        saveToLocalStorage(backlog);
-    }
+/** 
+* * saveToLocalStorage
+*  Saving the array in local storage
+*/
+
+ function saveToLocalStorage(item){
+    localStorage.setItem(`${item}`, JSON.stringify(this));
 }
 
+/** 
+* * getAllFromLocalStorage
+* ? Loads only once, just to fetch latest data, if there is any
+*/
+
+ function getAllFromLocalStorage(){
+  backlog  = JSON.parse(localStorage.getItem('backlog')) || [];
+  progress  = JSON.parse(localStorage.getItem('progress')) || [];
+  complete  = JSON.parse(localStorage.getItem('complete')) || [];
+  onHold  = JSON.parse(localStorage.getItem('on-hold')) || [];
+
+}
+
+// This variable will become draged element once we start draging
+
+let tempEl;
+
+//this will become id of list we drag from
+
+let fromListID;
+
+/** 
+* * drag
+* @param e Event that triggers when we start draging item
+* ? This event is holding dragged item as a target
+* ? Now we set tempEl to be that item, we need that for later
+*/
+
+
+ function drag(e){
+    tempEl = e.target;
+    fromListID = e.target.parentElement.id;
+}
+
+
+/** 
+* * allowDrop
+* @param e Event that triggers when we enter the ul list
+* ? We just need to prevent default behavior of ul list
+* ? List will now show that dragged item can be droped inside ul list
+* * Adding class for list that will receive item, also removing same class from other lists if any
+*/
+
+ function allowDrop(e){
+    e.preventDefault();
+    for(let i = 0; i < ulElems.length; i++){
+        ulElems[i].classList.remove('on-hover-column');
+    }
+    e.target.classList.add('on-hover-column');
+}
+
+ function trashItem(e){
+    e.preventDefault();
+    e.target.style.color = 'red';
+}
+
+ function trashDrop(e){
+    e.preventDefault();
+    removeFromArray(fromListID, tempEl.textContent);
+    e.target.style.color = 'white';
+}
+
+
+/** 
+* * drop
+* @param e Event that triggers when we release dragged item
+* ! Event triggers when we release the item, event target is the element
+* ! we are releasing to, not the element we are dragging
+* ! That is why we stored dragged item first
+* ? Just like we show that ul list can accept dragged item
+* ? Now we need to accept it also, and that is also not a default behavior
+*/
+
+
+ function drop(e){
+    e.preventDefault();
+    const { target } = e;
+    let { id } = e.target;
+
+    target.classList.remove('on-hover-column');
+
+    if(!id){
+        id = target.parentElement.id;
+    }
+    // This event holds item of ul list that accepts draged item, so we can extract id
+    pushToArray(id)
+}
 /** 
 * * render
 * ? For each array item renders li elemnet
 * ? Renders for all for arrays at page load
 */
 
-function renderOnce(){
+ function renderOnce(){
     let backlogFragment = document.createDocumentFragment();
     let progressFragment = document.createDocumentFragment();
     let completeFragment = document.createDocumentFragment();
@@ -92,6 +166,7 @@ function renderOnce(){
 
 }
 
+
 /** 
 * * reRenderList
 * @param id Id of ul list that needs to rerender
@@ -99,7 +174,7 @@ function renderOnce(){
 * ! This is most called function, any performance improvement is good to implement
 */
 
-function reRenderList(id){
+ function reRenderList(id){
     let fragment = document.createDocumentFragment();
     let list = document.getElementById(id);
     while(list.firstElementChild){
@@ -118,7 +193,7 @@ function reRenderList(id){
 */
 
 
-function createLiElement(textContent){
+ function createLiElement(textContent){
     let el = document.createElement('li');
     el.classList.add('item');
     el.draggable = true;
@@ -129,8 +204,22 @@ function createLiElement(textContent){
     return el;
 }
 
-function editContent(e){
-    console.log('happens')
+ function addNewItem(e){
+    if(newItem.value !== ''){
+        backlog.push(newItem.value);
+        reRenderList.call(backlog, 'backlog');
+        newItem.value = '';
+        saveToLocalStorage(backlog);
+    }
+}
+
+/** 
+* * editContent
+* @param e The target element where the double click occurs
+* ? This function enables and disables editable property of an element
+*/
+ function editContent(e){
+
     if(e.target.contentEditable === "false"){
         e.target.contentEditable = "true";
         e.target.classList.add('edit');
@@ -140,73 +229,6 @@ function editContent(e){
     }
 }
 
-/** 
-* * drag
-* @param e Event that triggers when we start draging item
-* ? This event is holding dragged item as a target
-* ? Now we set tempEl to be that item, we need that for later
-*/
-
-
-function drag(e){
-    tempEl = e.target;
-    fromListID = e.target.parentElement.id;
-}
-
-
-/** 
-* * allowDrop
-* @param e Event that triggers when we enter the ul list
-* ? We just need to prevent default behavior of ul list
-* ? List will now show that dragged item can be droped inside ul list
-* * Adding class for list that will receive item, also removing same class from other lists if any
-*/
-
-function allowDrop(e){
-    e.preventDefault();
-    for(let i = 0; i < ulElems.length; i++){
-        ulElems[i].classList.remove('on-hover-column');
-    }
-    e.target.classList.add('on-hover-column');
-}
-
-function trashItem(e){
-    e.preventDefault();
-    e.target.style.color = 'red';
-}
-
-function trashDrop(e){
-    e.preventDefault();
-    removeFromArray(fromListID, tempEl.textContent);
-    e.target.style.color = 'white';
-}
-
-
-/** 
-* * drop
-* @param e Event that triggers when we release dragged item
-* ! Event triggers when we release the item, event target is the element
-* ! we are releasing to, not the element we are dragging
-* ! That is why we stored dragged item first
-* ? Just like we show that ul list can accept dragged item
-* ? Now we need to accept it also, and that is also not a default behavior
-*/
-
-
-function drop(e){
-    e.preventDefault();
-    const { target } = e;
-    let { id } = e.target;
-
-    target.classList.remove('on-hover-column');
-
-    if(!id){
-        id = target.parentElement.id;
-    }
-    // This event holds item of ul list that accepts draged item, so we can extract id
-    pushToArray(id)
-}
-
 
 /** 
 * * pushToArray
@@ -214,7 +236,7 @@ function drop(e){
 * ? We push text content of dragged item into correct array
 */
 
-function pushToArray(id){
+ function pushToArray(id){
     const item = tempEl;
     if(id == backLogUl.getAttribute('id')){
           backlog.push(item.textContent);
@@ -248,7 +270,7 @@ function pushToArray(id){
 * * 
 */
 
-function removeFromArray(arrID, textMatch){
+ function removeFromArray(arrID, textMatch){
     if(arrID === 'backlog'){
         let index = backlog.indexOf(textMatch);
         backlog.splice(index, 1);
@@ -274,26 +296,5 @@ function removeFromArray(arrID, textMatch){
         saveToLocalStorage.call(onHold, arrID);
     }
 }
-
-/** 
-* * saveToLocalStorage
-*  Saving the array in local storage
-*/
-
-function saveToLocalStorage(item){
-    localStorage.setItem(`${item}`, JSON.stringify(this));
-}
-
-/** 
-* * getAllFromLocalStorage
-* ? Loads only once, just to fetch latest data, if there is any
-*/
-function getAllFromLocalStorage(){
-  backlog  = JSON.parse(localStorage.getItem('backlog')) || [];
-  progress  = JSON.parse(localStorage.getItem('progress')) || [];
-  complete  = JSON.parse(localStorage.getItem('complete')) || [];
-  onHold  = JSON.parse(localStorage.getItem('on-hold')) || [];
-}
-
 getAllFromLocalStorage();
 setup();
