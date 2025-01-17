@@ -182,7 +182,10 @@ body{
     display: none;
 }
 .hide:checked ~ .add{
+    max-width: 100%;
     display: block;
+    width: 100%;
+    margin: 0;
 }
 .add-holder{
     padding: 3px;
