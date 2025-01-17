@@ -79,14 +79,11 @@ body{
     background-color: rgba(0, 0, 0, 0.726);
 }
 .list{
-    width: 90%;
-    margin: 20px auto;
     list-style-type: none;
     text-align: left;
-    padding: 0;
+    padding: 10px 0;
     background-color: #21222234;
-    height: calc(100% - 85px);
-    max-height: 42vh;
+    height: 100%;
     overflow-y: auto;
 }
 .on-hover-column{
@@ -119,6 +116,8 @@ body{
     background-color: #a22d22a9;
 }
 .column{
+    display:flex;
+    flex-direction: column;
     border-radius: 4px;
     flex: 1;
     margin: 10px;
