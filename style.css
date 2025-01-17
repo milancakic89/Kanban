@@ -1,5 +1,7 @@
+*{
+     box-sizing: border-box;
+}
 html{
-    box-sizing: border-box;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
 }
 ::-webkit-scrollbar {
